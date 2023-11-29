@@ -16,6 +16,8 @@ SYSTEM_MODE(SEMI_AUTOMATIC);
 
 const int SERVOPIN=D16;
 float servoAngle();
+float angle;
+int month, day; 
 
 // Run the application and system concurrently in separate threads
 //SYSTEM_THREAD(ENABLED);
@@ -34,27 +36,38 @@ Serial.begin(9600);
 
 // loop() runs over and over again, as quickly as it can execute.
 void loop() {
-  servoAngle ();
-  // myServo.write(angle);
-  // delay (2000);
+  
+  for (month=0; month<12; month++) {
+    for (day=0; day<31; day++) {
+  
+  angle=servoAngle ();
+    if (angle!=-1){
+  myServo.write(angle);
+  delay (2000);
+    }
+    else {}
+  }
+  }
 
 }
 
 float servoAngle () {
-float angle;
-int i, x; 
+//float angle;
+//int month, day; 
 
-// create int to run through aray
 
-for (i=0; i<12; i++) {
-  for (x=0; x<31; x++) {
+    angle=map(waterFlow[day][month], 0, 5000, 125, 40); //inverted for servo orientation
     
-    angle = map(waterFlow[i][x], 0, 5000, 40, 125);
-    Serial.printf ("Waterflow is %i, angle is %f\n", waterFlow[i][x], angle);
-    return angle;
+    if (waterFlow[day][month]<0){
+      Serial.printf ("fake date\n");
+      return -1;
+    }
+    else {
+      Serial.printf ("Waterflow is %i, angle is %f\n", waterFlow[day][month], angle);
+      return angle;
+    }
+ 
 
-  }
 }
 //if value > 0 - eliminates false days
 // for loop
-}
