@@ -9,7 +9,10 @@
 // Include Particle Device OS APIs
 #include "Particle.h"
 #include "waterflow.h"
-Servo myServo;
+#include <neopixel.h> 
+#include <Colors.h>
+#include "IoTTimer.h"
+
 
 // Let Device OS manage the connection to the Particle Cloud
 SYSTEM_MODE(SEMI_AUTOMATIC);
@@ -18,6 +21,14 @@ const int SERVOPIN=D16;
 float servoAngle();
 float angle;
 int month, day; 
+const unsigned int UPDATE = 2000;
+unsigned int lastAngle;
+const int PIXELCOUNT = 30;
+
+
+Servo myServo;
+Adafruit_NeoPixel pixel ( PIXELCOUNT , SPI1 , WS2812B );
+IoTTimer dayTimer;
 
 // Run the application and system concurrently in separate threads
 //SYSTEM_THREAD(ENABLED);
@@ -32,24 +43,36 @@ myServo.attach(SERVOPIN);
 
 Serial.begin(9600);
 
+pixel.begin ();
+  pixel.show (); // initialize all off
+  pixel.setBrightness (24);
+
+dayTimer.startTimer(1000);
+
 }
 
 // loop() runs over and over again, as quickly as it can execute.
 void loop() {
-  
-  for (month=0; month<12; month++) {
-    for (day=0; day<31; day++) {
-  
-  angle=servoAngle ();
-    if (angle!=-1){
-  myServo.write(angle);
-  delay (2000);
-    }
-    else {}
-  }
-  }
 
-}
+  if (dayTimer.isTimerReady()) {
+    day++;
+    dayTimer.startTimer(1000);
+      if (day==31) {
+        day=1;
+        month++; 
+      }
+
+angle=servoAngle ();
+  if (angle!=-1){
+  //delay (2000);
+      myServo.write(angle);   // how to do multiple servos?
+    }
+  else {}
+  }
+    }
+  // for (month=0; month<12; month++) {
+  //   for (day=0; day<31; day++) {
+
 
 float servoAngle () {
 //float angle;
