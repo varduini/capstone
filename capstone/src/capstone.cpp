@@ -19,15 +19,18 @@ SYSTEM_MODE(SEMI_AUTOMATIC);
 
 const int SERVOPIN=D16;
 float servoAngle();
+void pixelFill(int startPixel, int endPixel, int hexColor);
 float angle;
+int pixelOn;
 int month, day; 
 const unsigned int UPDATE = 2000;
 unsigned int lastAngle;
 const int PIXELCOUNT = 30;
-
+int endPixel;
+int startPixel;
 
 Servo myServo;
-Adafruit_NeoPixel pixel ( PIXELCOUNT , SPI1 , WS2812B );
+Adafruit_NeoPixel pixel (PIXELCOUNT, SPI1, WS2812B);
 IoTTimer dayTimer;
 
 // Run the application and system concurrently in separate threads
@@ -49,6 +52,8 @@ pixel.begin ();
 
 dayTimer.startTimer(1000);
 
+
+
 }
 
 // loop() runs over and over again, as quickly as it can execute.
@@ -57,27 +62,29 @@ void loop() {
   if (dayTimer.isTimerReady()) {
     day++;
     dayTimer.startTimer(1000);
-      if (day==31) {
+      if (day==30) {
         day=1;
         month++; 
       }
 
-angle=servoAngle ();
+angle=servoAngle();
+//pixelOn=pixelBirds();
+
   if (angle!=-1){
   //delay (2000);
       myServo.write(angle);   // how to do multiple servos?
+      pixelFill(startPixel, endPixel,teal);
+      Serial.printf ("Start Pixel is %i, end pixel is %i\n",startPixel, endPixel);
+      //pixel.setPixelColor ();
+     // pixel.show (); 
     }
   else {}
+   pixel.clear(); 
   }
     }
-  // for (month=0; month<12; month++) {
-  //   for (day=0; day<31; day++) {
 
 
 float servoAngle () {
-//float angle;
-//int month, day; 
-
 
     angle=map(waterFlow[day][month], 0, 5000, 125, 40); //inverted for servo orientation
     
@@ -89,8 +96,29 @@ float servoAngle () {
       Serial.printf ("Waterflow is %i, angle is %f\n", waterFlow[day][month], angle);
       return angle;
     }
- 
+}
+
+void pixelFill(int startPixel, int endPixel, int hexColor) {
+  //int randNumber;
+  int i;
+
+i=random(0,20);
+
+for (i=startPixel; i<=endPixel; i++) {
+ if (month<6) {
+  //startPixel=0;
+  //*endPixel=randNumber;
+  pixel.setPixelColor (i, hexColor);
+ }
+ else {
+  // *startPixel=PIXELCOUNT;
+  // *endPixel= PIXELCOUNT-randNumber;
+  pixel.setPixelColor (PIXELCOUNT-i, hexColor);
+ }
+
+  pixel.show();
 
 }
-//if value > 0 - eliminates false days
-// for loop
+}
+
+
