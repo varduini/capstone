@@ -12,6 +12,7 @@
 #include <neopixel.h> 
 #include <Colors.h>
 #include "IoTTimer.h"
+#include "math.h"
 #include "birddata.h"
 
 // Let Device OS manage the connection to the Particle Cloud
@@ -99,18 +100,20 @@ int servoAngle () {
 }
 
 void birdLights (int birdData[31][12], int *startPixel, int *endPixel) {
-
-*endPixel=map(birdData[day][month], 9800, 24000000, 0, 30);
-//i=random(0,20);
+int x;
 
 *startPixel= 0;
+*endPixel=map((int)log2(birdData[day][month]), 13, 25, 0, 29);
 
-  //*endPixel=randNumber;
+if (birdData[day][month]==0) {
+  x=random(0,3);
+  *endPixel=x;
+}
 
 // *startPixel=PIXELCOUNT;
   // *endPixel= PIXELCOUNT-randNumber;
   Serial.printf ("birds are %i\n", birdData[day][month]);
-Serial.printf ("Start Pixel is %i, end pixel is %i\n",startPixel, endPixel);
+Serial.printf ("Start Pixel is %i, end pixel is %i\n",*startPixel, *endPixel);
 
 }
 
@@ -127,7 +130,7 @@ for (i=startPixel; i<=endPixel; i++) {
  else {
   pixel.setPixelColor (PIXELCOUNT-i, hexColor);
  }
-
+Serial.printf ("I am filling %i to %i\n",startPixel, endPixel);
   pixel.show();
 
 }
