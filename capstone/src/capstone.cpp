@@ -21,11 +21,11 @@ const int SERVOPIN=D16;
 int servoAngle();
 void birdLights (int birdData[31][12], int *startPixel, int *endPixel);
 void pixelFill(int startPixel, int endPixel, int hexColor, int month);
-float angle;
-int pixelOn;
+int angle;
+//int pixelOn;
 int month, day; 
-const unsigned int UPDATE = 2000;
-unsigned int lastAngle;
+//const unsigned int UPDATE = 2000;
+//unsigned int lastAngle;
 const int PIXELCOUNT = 30;
 int endPixel, startPixel;
 
