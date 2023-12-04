@@ -24,17 +24,18 @@ int servoAngle();
 void birdLights (int birdData[31][12], int *startPixel, int *endPixel);
 void pixelFill(int startPixel, int endPixel, int hexColor, int month);
 void serveUp(int servonum, int angle);
+void serveUpNew(int servonum, int angle);
 int angle;
 //int pixelOn;
 int month, day; 
 //const unsigned int UPDATE = 2000;
 //unsigned int lastAngle;
-const int PIXELCOUNT = 30;
+const int PIXELCOUNT = 24;
 int endPixel, startPixel;
 const int SERVOMIN = 150; // this is the 'minimum' pulse length count (out of 4096)
 const int SERVOMAX = 600; // this is the 'maximum' pulse length count (out of 4096)
 int i;
-//int whichServo = i;
+int sAngle;
 
 //Servo myServo;
 Adafruit_NeoPixel pixel (PIXELCOUNT, SPI1, WS2812B);
@@ -71,26 +72,27 @@ void loop() {
 
   if (dayTimer.isTimerReady()) {
     day++;
-    dayTimer.startTimer(3000);
+    dayTimer.startTimer(1000);
       if (day==30) {
         day=1;
         month++; 
       }
-
-//angle=servoAngle();
-  for(i=10;i<=180;i=i+20) {
-    //for (i=0; i<=5; i++) {
-    serveUp(0,i); //0-180 angle
-      delay(2000);
-    serveUp(1,i); //0-180 angle
-   delay(2000);
-  }
+  
+angle=servoAngle();
+//   // for(i=10;i<=180;i=i+20) {
+for (i=0; i<=5; i++) {
+serveUpNew(i, angle); //0-180 angle
+//   //     delay(2000);
+// serveUp(1,angle); //0-180 angle
+//   //  delay(2000);
+}
 
   if (angle!=-1){
   //delay (2000);
       //myServo.write(angle);   // how to do multiple servos?
       birdLights (birdData, &startPixel, &endPixel);//function to determine startPixel, endPixel
-      pixelFill(startPixel, endPixel,teal, month); 
+      pixel.clear(); 
+      pixelFill(startPixel, endPixel,teal, month); // how to have variations? 
       
       //pixel.setPixelColor ();
      // pixel.show (); 
@@ -119,9 +121,9 @@ void birdLights (int birdData[31][12], int *startPixel, int *endPixel) {
 int x;
 
 *startPixel= 0;
-*endPixel=map((int)log2(birdData[day][month]), 13, 25, 0, 29);
+*endPixel=map((int)log2(birdData[day][month]), 13, 25, 0, 23);
 
-if (birdData[day][month]==0) {
+if (birdData[day][month]==0) { 
   x=random(0,3);
   *endPixel=x;
 }
@@ -145,6 +147,7 @@ for (i=startPixel; i<=endPixel; i++) {
  }
  else {
   pixel.setPixelColor (PIXELCOUNT-i, hexColor);
+  
  }
 Serial.printf ("I am filling %i to %i\n",startPixel, endPixel);
   pixel.show();
@@ -152,16 +155,28 @@ Serial.printf ("I am filling %i to %i\n",startPixel, endPixel);
 }
 }
 
-void serveUp(int servonum, int angle) {
 
-  int pulselen;
-  int servoAngle;
-  static int lastAngle = 0;
+void serveUpNew(int servonum, int angle) {
 
-  servoAngle = map(angle,0,180,SERVOMIN,SERVOMAX);
+  int sAngle;
+
+  sAngle = map(angle,0,180,SERVOMIN,SERVOMAX);
   Serial.printf("Servo Number = %i to Angle = %i\n",servonum,angle);
-  for (pulselen = lastAngle; pulselen < servoAngle; pulselen++) {
-    pwm.setPWM(servonum, 0, pulselen);
-  }
-  lastAngle = servoAngle;
+  //pwm.setPWM(servonum, 0, 165);
+  delay(500);
+  pwm.setPWM(servonum, 0, sAngle);
 }
+
+// void serveUp(int servonum, int angle) {
+
+//   int pulselen;
+//   int servoAngle;
+//   static int lastAngle = 0;
+
+//   servoAngle = map(angle,0,180,SERVOMIN,SERVOMAX);
+//   Serial.printf("Servo Number = %i to Angle = %i\n",servonum,angle);
+//   for (pulselen = lastAngle; pulselen < servoAngle; pulselen++) {
+//     pwm.setPWM(servonum, 0, pulselen);
+//   }
+//   lastAngle = servoAngle;
+// }
