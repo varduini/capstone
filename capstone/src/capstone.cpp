@@ -15,9 +15,18 @@
 #include "math.h"
 #include "birddata.h"
 #include "Adafruit_PWMServoDriver.h"
+#include "credentials.h"
+#include <Adafruit_MQTT.h>
+#include "Adafruit_MQTT/Adafruit_MQTT_SPARK.h"
+#include "Adafruit_MQTT/Adafruit_MQTT.h"
 
 // Let Device OS manage the connection to the Particle Cloud
 SYSTEM_MODE(SEMI_AUTOMATIC);
+
+TCPClient TheClient; 
+Adafruit_MQTT_SPARK mqtt(&TheClient,AIO_SERVER,AIO_SERVERPORT,AIO_USERNAME,AIO_KEY); 
+
+Adafruit_MQTT_Subscribe waterButton = Adafruit_MQTT_Subscribe(&mqtt, AIO_USERNAME "/feeds/waterbutton"); 
 
 const int SERVOPIN=D16;
 int servoAngle();
@@ -36,12 +45,17 @@ const int SERVOMIN = 150; // this is the 'minimum' pulse length count (out of 40
 const int SERVOMAX = 600; // this is the 'maximum' pulse length count (out of 4096)
 int i;
 int sAngle;
+float subValue;
 
 //Servo myServo;
 Adafruit_NeoPixel pixel (PIXELCOUNT, SPI1, WS2812B);
 IoTTimer dayTimer;
 Adafruit_PWMServoDriver pwm=Adafruit_PWMServoDriver();
 
+void MQTT_connect();
+bool MQTT_ping();
+
+SerialLogHandler logHandler(LOG_LEVEL_INFO);
 
 // Run the application and system concurrently in separate threads
 //SYSTEM_THREAD(ENABLED);
@@ -65,10 +79,23 @@ void setup() {
   pwm.begin();
   pwm.setPWMFreq(60);
 
+    WiFi.on();
+  WiFi.connect();
+  while(WiFi.connecting()) {
+    Serial.printf(".");
+  }
+  Serial.printf("\n\n");
+
+mqtt.subscribe(&waterButton);
+
+
 }
 
 // loop() runs over and over again, as quickly as it can execute.
 void loop() {
+
+MQTT_connect();
+  MQTT_ping();
 
   if (dayTimer.isTimerReady()) {
     day++;
@@ -101,7 +128,57 @@ serveUpNew(i, angle); //0-180 angle
    pixel.clear(); 
   }
   }
+
+  Adafruit_MQTT_Subscribe *subscription;
+  while ((subscription = mqtt.readSubscription(10000))) {
+    if (subscription == &waterButton) {
+      subValue = atof((char *)waterButton.lastread);
+      if (subValue == 1){
+      Serial.printf ("new submission!\n");
+      pixel.clear(); 
+      pixelFill(0, 23, magenta, month);
+      delay (1000);
+      }
+        else  {}
+    }
+  }
 }
+
+void MQTT_connect() {
+  int8_t ret;
+ 
+  // Return if already connected.
+  if (mqtt.connected()) {
+    return;
+  }
+ 
+  Serial.print("Connecting to MQTT... ");
+ 
+  while ((ret = mqtt.connect()) != 0) { // connect will return 0 for connected
+       Serial.printf("Error Code %s\n",mqtt.connectErrorString(ret));
+       Serial.printf("Retrying MQTT connection in 5 seconds...\n");
+       mqtt.disconnect();
+       delay(5000);  // wait 5 seconds and try again
+  }
+  Serial.printf("MQTT Connected!\n");
+}
+
+bool MQTT_ping() {
+  static unsigned int last;
+  bool pingStatus;
+
+  if ((millis()-last)>120000) {
+      Serial.printf("Pinging MQTT \n");
+      pingStatus = mqtt.ping();
+      if(!pingStatus) {
+        Serial.printf("Disconnecting \n");
+        mqtt.disconnect();
+      }
+      last = millis();
+  }
+  return pingStatus;
+}
+
 
 int servoAngle () {
 
