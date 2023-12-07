@@ -80,7 +80,7 @@ void loop() {
   
 angle=servoAngle();
 //   // for(i=10;i<=180;i=i+20) {
-for (i=0; i<=5; i++) {
+for (i=0; i<6; i++) {
 serveUpNew(i, angle); //0-180 angle
 //   //     delay(2000);
 // serveUp(1,angle); //0-180 angle
@@ -105,7 +105,7 @@ serveUpNew(i, angle); //0-180 angle
 
 int servoAngle () {
 
-    angle=map(waterFlow[day][month], 0, 5000, 125, 40); //inverted for servo orientation
+    angle=map(waterFlow[day][month], 0, 5000, 0, 165); //inverted for servo orientation
     
     if (waterFlow[day][month]<0){
       Serial.printf ("fake date\n");
@@ -163,7 +163,7 @@ void serveUpNew(int servonum, int angle) {
   sAngle = map(angle,0,180,SERVOMIN,SERVOMAX);
   Serial.printf("Servo Number = %i to Angle = %i\n",servonum,angle);
   //pwm.setPWM(servonum, 0, 165);
-  delay(500);
+  delay(250);
   pwm.setPWM(servonum, 0, sAngle);
 }
 

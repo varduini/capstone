@@ -9,7 +9,7 @@ const int SERVOMAX = 600; // this is the 'maximum' pulse length count (out of 40
 
 int i,bri;
 float t;
-int whichServo = 0;
+int whichServo = 1;
 int pulselen;
 
 void angleTest();
@@ -28,7 +28,7 @@ void setup() {
 
 void loop() {
   for(i=10;i<=180;i=i+20) {
-    serveUp(whichServo,i); //0-180 angle
+    serveUp(whichServo,i);
     delay(2000);
   }
 
