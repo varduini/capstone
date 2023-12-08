@@ -35,10 +35,7 @@ void pixelFill(int startPixel, int endPixel, int hexColor, int month);
 void serveUp(int servonum, int angle);
 void serveUpNew(int servonum, int angle);
 int angle;
-//int pixelOn;
 int month, day; 
-//const unsigned int UPDATE = 2000;
-//unsigned int lastAngle;
 const int PIXELCOUNT = 23;
 int endPixel, startPixel;
 const int SERVOMIN = 150; // this is the 'minimum' pulse length count (out of 4096)
@@ -56,13 +53,6 @@ void MQTT_connect();
 bool MQTT_ping();
 
 SerialLogHandler logHandler(LOG_LEVEL_INFO);
-
-// Run the application and system concurrently in separate threads
-//SYSTEM_THREAD(ENABLED);
-
-// Show system, cloud connectivity, and application logs over USB
-// View logs with CLI using 'particle serial monitor --follow'
-//SerialLogHandler logHandler(LOG_LEVEL_INFO);
 
 // setup() runs once, when the device is first turned on
 void setup() {
@@ -106,23 +96,15 @@ MQTT_connect();
       }
   
 angle=servoAngle();
-//   // for(i=10;i<=180;i=i+20) {
 for (i=0; i<6; i++) {
 serveUpNew(i, angle); //0-180 angle
-//   //     delay(2000);
-// serveUp(1,angle); //0-180 angle
-//   //  delay(2000);
-}
+
 
   if (angle!=-1){
-  //delay (2000);
-      //myServo.write(angle);   // how to do multiple servos?
       birdLights (birdData, &startPixel, &endPixel);//function to determine startPixel, endPixel
       pixel.clear(); 
       pixelFill(startPixel, endPixel,teal, month); // how to have variations? 
-      
-      //pixel.setPixelColor ();
-     // pixel.show (); 
+  
     }
   else {
    pixel.clear(); 
@@ -142,6 +124,7 @@ serveUpNew(i, angle); //0-180 angle
         else  {}
     }
   }
+}
 }
 
 void MQTT_connect() {
@@ -181,7 +164,7 @@ bool MQTT_ping() {
 
 int servoAngle () {
 
-    angle=map(waterFlow[day][month], 0, 5000, 10, 165); //inverted for servo orientation
+    angle=map(waterFlow[day][month], 0, 5000, 10, 165);
     
     if (waterFlow[day][month]<0){
       Serial.printf ("fake date\n");
@@ -204,15 +187,12 @@ if (birdData[day][month]==0) {
   *endPixel=x;
 }
 
-// *startPixel=PIXELCOUNT;
-  // *endPixel= PIXELCOUNT-randNumber;
   Serial.printf ("birds are %i\n", birdData[day][month]);
-Serial.printf ("Start Pixel is %i, end pixel is %i\n",*startPixel, *endPixel);
+  Serial.printf ("Start Pixel is %i, end pixel is %i\n",*startPixel, *endPixel);
 
 }
 
 void pixelFill(int startPixel, int endPixel, int hexColor, int month) {
-  //int randNumber;
   int i;
 
 
@@ -238,21 +218,7 @@ void serveUpNew(int servonum, int angle) {
 
   sAngle = map(angle,0,180,SERVOMIN,SERVOMAX);
   Serial.printf("Servo Number = %i to Angle = %i\n",servonum,angle);
-  //pwm.setPWM(servonum, 0, 165);
   delay(250);
   pwm.setPWM(servonum, 0, sAngle);
 }
 
-// void serveUp(int servonum, int angle) {
-
-//   int pulselen;
-//   int servoAngle;
-//   static int lastAngle = 0;
-
-//   servoAngle = map(angle,0,180,SERVOMIN,SERVOMAX);
-//   Serial.printf("Servo Number = %i to Angle = %i\n",servonum,angle);
-//   for (pulselen = lastAngle; pulselen < servoAngle; pulselen++) {
-//     pwm.setPWM(servonum, 0, pulselen);
-//   }
-//   lastAngle = servoAngle;
-// }

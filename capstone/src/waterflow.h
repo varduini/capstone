@@ -1,4 +1,4 @@
-//		Mean of daily mean value (Calculation Period 2021-10-01 -> 2023-09-30)																							
+//		Mean of daily mean value (Calculation Period 2022-01-01 -> 2022-12-31)																							
 //		Jan		Feb		Mar		Apr		May		Jun		Jul		Aug		Sept		Oct		Nov		Dec	
 																									
 int waterFlow [31][12] = {																									
