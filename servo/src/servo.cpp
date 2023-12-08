@@ -9,7 +9,7 @@ const int SERVOMAX = 600; // this is the 'maximum' pulse length count (out of 40
 
 int i,bri;
 float t;
-int whichServo = 1;
+int whichServo = 3;
 int pulselen;
 
 void angleTest();

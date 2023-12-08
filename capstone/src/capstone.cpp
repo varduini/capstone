@@ -39,7 +39,7 @@ int angle;
 int month, day; 
 //const unsigned int UPDATE = 2000;
 //unsigned int lastAngle;
-const int PIXELCOUNT = 24;
+const int PIXELCOUNT = 23;
 int endPixel, startPixel;
 const int SERVOMIN = 150; // this is the 'minimum' pulse length count (out of 4096)
 const int SERVOMAX = 600; // this is the 'maximum' pulse length count (out of 4096)
@@ -179,10 +179,9 @@ bool MQTT_ping() {
   return pingStatus;
 }
 
-
 int servoAngle () {
 
-    angle=map(waterFlow[day][month], 0, 5000, 0, 165); //inverted for servo orientation
+    angle=map(waterFlow[day][month], 0, 5000, 10, 165); //inverted for servo orientation
     
     if (waterFlow[day][month]<0){
       Serial.printf ("fake date\n");
